@@ -84,6 +84,11 @@ const btnStartRecording = document.getElementById('btnStartRecording');
 const btnStopRecording = document.getElementById('btnStopRecording');
 const btnCloseVideoOverlay = document.getElementById('btnCloseVideoOverlay');
 
+// Elementos de Regras
+const btnInfoRules = document.getElementById('btnInfoRules');
+const rulesOverlay = document.getElementById('rulesOverlay');
+const btnCloseRulesOverlay = document.getElementById('btnCloseRulesOverlay');
+
 /********** VARIÁVEIS GLOBAIS **********/
 let gameCode = null;
 let myPlayerKey = null;
@@ -121,6 +126,8 @@ btnStartGame.onclick = startGameHost;
 btnDrawCard.onclick = drawCardHost;
 btnEndGame.onclick = endGameHost;
 btnHostSendChat.onclick = sendChatAsHost;
+btnInfoRules.onclick = showRulesOverlay;
+btnCloseRulesOverlay.onclick = closeRulesOverlay;
 
 // Enter para enviar mensagens
 hostChatInput.addEventListener('keypress', (e) => {
@@ -447,6 +454,20 @@ async function drawCardHost(){
     if(!gameData.deck || gameData.deck.length === 0){
       addLog("Baralho acabou!");
       btnDrawCard.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Baralho vazio';
+      
+      // Exibir o botão de novo baralho se já estiver vazio
+      if (!document.getElementById('btnNewDeck')) {
+        const btnNewDeck = document.createElement('button');
+        btnNewDeck.id = 'btnNewDeck';
+        btnNewDeck.className = 'btn-primary';
+        btnNewDeck.innerHTML = '<i class="fas fa-sync-alt"></i> Gerar Novo Baralho';
+        btnNewDeck.onclick = generateNewDeck;
+        btnNewDeck.style.marginTop = '10px';
+        btnNewDeck.style.width = '100%';
+        
+        // Inserir antes do botão de puxar carta
+        btnDrawCard.parentNode.insertBefore(btnNewDeck, btnDrawCard.nextSibling);
+      }
       return;
     }
     
@@ -458,6 +479,10 @@ async function drawCardHost(){
       deck: newDeck,
       currentCard: card
     });
+    
+    // Mostrar a explicação da regra para esta carta
+    showCardRule(card.rank);
+    
   } catch (error) {
     alert("Erro ao puxar carta: " + error.message);
   } finally {
@@ -469,6 +494,13 @@ async function drawCardHost(){
 function endGameHost(){
   if (confirm("Tem certeza que deseja encerrar a partida?")) {
     db.ref(`games/${gameCode}`).update({status: 'finished'})
+      .then(() => {
+        // Limpa cache local ao encerrar a partida
+        localStorage.removeItem("opoderdedo_gameId");
+        localStorage.removeItem("opoderdedo_playerKey");
+        localStorage.removeItem("opoderdedo_playerName");
+        setTimeout(() => location.reload(), 1000);
+      })
       .catch(error => alert("Erro ao encerrar partida: " + error.message));
   }
 }
@@ -844,6 +876,10 @@ function updatePlayerView(gameData){
   }
   else if(gameData.status === 'finished'){
     alert("Esta partida foi encerrada!");
+    // Limpa cache local quando a partida for finalizada
+    localStorage.removeItem("opoderdedo_gameId");
+    localStorage.removeItem("opoderdedo_playerKey");
+    localStorage.removeItem("opoderdedo_playerName");
     setTimeout(() => location.reload(), 1000); // Recarrega após o alerta
   }
 }
@@ -880,6 +916,10 @@ async function drawCardPlayer(){
       deck: newDeck, 
       currentCard: card
     });
+    
+    // Mostrar a explicação da regra para esta carta
+    showCardRule(card.rank);
+    
   } catch (error) {
     alert("Erro ao puxar carta: " + error.message);
   } finally {
@@ -966,6 +1006,15 @@ function finalizeFingerPower(){
     db.ref(`games/${gameCode}/players/${last.playerKey}/needsToDrink`).set(Date.now());
     db.ref(`games/${gameCode}/fingerPower`).update({active: false, queue: []});
   });
+}
+
+/********** REGRAS E OVERLAY **********/
+function showRulesOverlay() {
+  rulesOverlay.style.display = 'flex';
+}
+
+function closeRulesOverlay() {
+  rulesOverlay.style.display = 'none';
 }
 
 /********** GRAVAÇÃO VÍDEO **********/
@@ -1072,6 +1121,144 @@ function addLog(msg){
 /********** GERA CODE E BARALHO **********/
 function generateGameCode(){
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Função para gerar um novo baralho quando o atual acabar
+async function generateNewDeck(){
+  const btnNewDeck = document.getElementById('btnNewDeck');
+  if (btnNewDeck) {
+    btnNewDeck.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+    btnNewDeck.disabled = true;
+  }
+  
+  try {
+    const newDeck = generateDeck();
+    await db.ref(`games/${gameCode}/deck`).set(newDeck);
+    addLog("🎮 Um novo baralho foi gerado!");
+    
+    // Atualizar o botão de puxar carta
+    btnDrawCard.disabled = false;
+    btnDrawCard.innerHTML = '<i class="fas fa-hand-paper"></i> Puxar Carta';
+    
+    // Remover o botão de novo baralho
+    if (btnNewDeck) {
+      btnNewDeck.remove();
+    }
+  } catch (error) {
+    alert("Erro ao gerar novo baralho: " + error.message);
+    if (btnNewDeck) {
+      btnNewDeck.innerHTML = '<i class="fas fa-sync-alt"></i> Gerar Novo Baralho';
+      btnNewDeck.disabled = false;
+    }
+  }
+}
+
+// Função para mostrar a regra da carta
+function showCardRule(rank) {
+  // Criar ou atualizar o painel de regras de carta
+  let rulePanel = document.getElementById('cardRulePanel');
+  if (!rulePanel) {
+    rulePanel = document.createElement('div');
+    rulePanel.id = 'cardRulePanel';
+    rulePanel.className = 'card-rule-panel';
+    
+    // Adicionar ao host e ao player
+    const hostStatusPanel = document.getElementById('hostStatusPanel');
+    const playerStatusPanel = document.getElementById('playerStatusPanel');
+    
+    if (hostStatusPanel && hostStatusPanel.parentNode) {
+      hostStatusPanel.parentNode.insertBefore(rulePanel.cloneNode(true), hostStatusPanel.nextSibling);
+    }
+    
+    if (playerStatusPanel && playerStatusPanel.parentNode) {
+      playerStatusPanel.parentNode.insertBefore(rulePanel, playerStatusPanel.nextSibling);
+    }
+  } else {
+    // Se já existir, limpar
+    rulePanel.innerHTML = '';
+  }
+  
+  // Definir regras para cada carta
+  let ruleText = '';
+  let ruleIcon = '';
+  
+  switch(rank) {
+    case 'A':
+      ruleText = 'Ás: Escolha alguém para beber';
+      ruleIcon = '🥃';
+      break;
+    case '2':
+      ruleText = '2: Você bebe';
+      ruleIcon = '🍺';
+      break;
+    case '3':
+      ruleText = '3: Todos bebem';
+      ruleIcon = '🍻';
+      break;
+    case '4':
+      ruleText = '4: Crie uma nova regra para o jogo';
+      ruleIcon = '📝';
+      break;
+    case '5':
+      ruleText = '5: Bebem todos os homens';
+      ruleIcon = '👨';
+      break;
+    case '6':
+      ruleText = '6: Todas as regras são anuladas';
+      ruleIcon = '💥';
+      break;
+    case '7':
+      ruleText = '7: "Eu nunca": Diga algo que nunca fez, quem já fez, bebe';
+      ruleIcon = '🙅';
+      break;
+    case '8':
+      ruleText = '8: Poder do Dedo - você pode iniciar a rodada do "último a colocar o dedo na mesa bebe"';
+      ruleIcon = '👆';
+      break;
+    case '9':
+      ruleText = '9: Inverte o sentido do jogo';
+      ruleIcon = '🔄';
+      break;
+    case '10':
+      ruleText = '10: Pula o próximo jogador';
+      ruleIcon = '⏭️';
+      break;
+    case 'J':
+      ruleText = 'Valete: Você bebe uma dose';
+      ruleIcon = '🤵';
+      break;
+    case 'Q':
+      ruleText = 'Rainha: Todas as mulheres bebem';
+      ruleIcon = '👸';
+      break;
+    case 'K':
+      ruleText = 'Rei: Todos os homens bebem';
+      ruleIcon = '👑';
+      break;
+    case 'Joker':
+      ruleText = 'Coringa: Você ganha um coringa para usar quando não quiser beber';
+      ruleIcon = '🃏';
+      break;
+    default:
+      ruleText = 'Carta especial';
+      ruleIcon = '❓';
+  }
+  
+  // Atualizar todos os painéis de regras
+  const rulePanels = document.querySelectorAll('.card-rule-panel');
+  rulePanels.forEach(panel => {
+    panel.innerHTML = `
+      <div class="rule-icon">${ruleIcon}</div>
+      <div class="rule-text">${ruleText}</div>
+    `;
+    panel.style.display = 'flex';
+    
+    // Animar para chamar atenção
+    panel.classList.add('rule-panel-animate');
+    setTimeout(() => {
+      panel.classList.remove('rule-panel-animate');
+    }, 1000);
+  });
 }
 
 function generateDeck(){
