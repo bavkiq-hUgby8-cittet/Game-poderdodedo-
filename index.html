@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>O Poder do Dedo - Versão 2.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-storage-compat.js"></script>
+
+  <!-- QRCode lib -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS personalizado -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="mainContainer">
+    <!-- Barra de navegação -->
+    <div class="navbar">
+      <h1><i class="fas fa-hand-point-up logo-icon"></i> O Poder do Dedo</h1>
+    </div>
+    
+    <div id="contentScroll">
+      <!-- Modo Seletor -->
+      <div id="modeSelect" class="section fade-in">
+        <div class="title">Escolha seu modo de jogo</div>
+        <div class="mode-selection">
+          <div id="hostCard" class="mode-card mode-card-host">
+            <div class="mode-card-header">
+              <h3>Organizador</h3>
+            </div>
+            <div class="mode-card-body">
+              <i class="fas fa-user-cog mode-card-icon"></i>
+              <p>Crie e gerencie uma nova partida</p>
+              <button id="btnHost" class="btn-dark btn-lg">
+                <i class="fas fa-crown"></i> Ser Organizador
+              </button>
+            </div>
+          </div>
+          
+          <div id="playerCard" class="mode-card mode-card-player">
+            <div class="mode-card-header">
+              <h3>Jogador</h3>
+            </div>
+            <div class="mode-card-body">
+              <i class="fas fa-gamepad mode-card-icon"></i>
+              <p>Participe de uma partida existente</p>
+              <button id="btnPlayer" class="btn-primary btn-lg">
+                <i class="fas fa-play"></i> Ser Jogador
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOST AREA -->
+      <div id="hostArea" class="hidden fade-in">
+        <div id="hostStep1" class="section">
+          <div class="title">Criar ou Entrar numa Partida</div>
+          <button id="btnCreateGame" class="btn-success btn-lg">
+            <i class="fas fa-plus-circle"></i> Criar Nova Partida
+          </button>
+          
+          <div style="text-align: center; margin: 15px 0;">
+            <div style="display: flex; align-items: center; margin: 15px 0;">
+              <hr style="flex: 1; border: none; border-top: 1px solid #ddd;">
+              <span style="padding: 0 10px; color: #888;">ou</span>
+              <hr style="flex: 1; border: none; border-top: 1px solid #ddd;">
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-hashtag"></i>
+            <input type="text" id="inputGameCodeHost" placeholder="Digite o código da partida..." />
+          </div>
+          <button id="btnJoinGameHost" class="btn-info btn-lg">
+            <i class="fas fa-sign-in-alt"></i> Entrar na Partida
+          </button>
+        </div>
+
+        <div id="hostLobby" class="hidden section">
+          <div class="title">Lobby da Partida</div>
+          
+          <div class="qr-container">
+            <p style="margin-bottom: 10px;">Código da partida: <span id="hostGameCode" style="font-weight: bold; font-size: 1.2em; color: var(--primary-dark);"></span></p>
+            <div id="qrCodeLobby"></div>
+            <p id="hostLinkInfo" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></p>
+            <p style="margin-top: 15px; color: #666; font-size: 0.9em;">Compartilhe o código ou QR code com os jogadores</p>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <div class="title" style="margin-bottom: 15px;">Jogadores Conectados</div>
+            <div id="hostPlayersList" class="players-list"></div>
+          </div>
+          
+          <button id="btnStartGame" class="btn-primary btn-lg" style="margin-top: 20px;">
+            <i class="fas fa-play-circle"></i> Iniciar Partida
+          </button>
+        </div>
+
+        <div id="hostGame" class="hidden">
+          <div class="game-grid">
+            <!-- Cabeçalho -->
+            <div class="header-area">
+              <div id="hostStatusPanel" class="status-panel"></div>
+            </div>
+            
+            <!-- Painel Esquerdo -->
+            <div class="left-panel">
+              <div class="section" style="height: 100%; display: flex; flex-direction: column;">
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                  <i class="fas fa-gamepad"></i> Controles de Jogo
+                </h4>
+                
+                <!-- Carta Atual -->
+                <div style="text-align: center; margin-bottom: 15px;">
+                  <h5 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                    <i class="fas fa-crown"></i> Carta Atual
+                  </h5>
+                  <div id="currentCardHost" style="text-align: center;">Nenhuma</div>
+                  <button id="btnDrawCard" class="btn-warning" style="margin-top: 15px; width: 100%;">
+                    <i class="fas fa-hand-paper"></i> Puxar Carta
+                  </button>
+                </div>
+                
+                <!-- Baralho -->
+                <div class="deck-container">
+                  <h5 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                    <i class="fas fa-layer-group"></i> Baralho
+                  </h5>
+                  <div id="deckCount" style="margin-bottom: 5px; color: var(--primary-dark); font-weight: 500;"></div>
+                  <div id="deckView"></div>
+                </div>
+                
+                <!-- QR Code -->
+                <div style="margin-top: auto; padding-top: 15px;">
+                  <div id="qrCodeGame" style="margin: 0 auto; width: fit-content;"></div>
+                  <p style="margin-top: 5px; font-size: 0.8em; color: #666; text-align: center;">Escaneie para entrar</p>
+                </div>
+                
+                <button id="btnEndGame" class="btn-danger" style="margin-top: 10px;">
+                  <i class="fas fa-stop-circle"></i> Encerrar Partida
+                </button>
+              </div>
+            </div>
+            
+            <!-- Painel Central - Eventos do Jogo -->
+            <div class="center-panel">
+              <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px; text-align: center;">
+                <i class="fas fa-history"></i> Eventos do Jogo
+              </h4>
+              <div class="main-panel-box">
+                <div id="hostPainel" class="event-log"></div>
+              </div>
+              
+              <!-- Regras Ativas -->
+              <div style="margin-top: 10px;">
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                  <i class="fas fa-book"></i> Regras Ativas
+                </h4>
+                <div id="hostRules" class="rules-box" style="max-height: 100px; overflow-y: auto;"></div>
+              </div>
+            </div>
+            
+            <!-- Painel Direito -->
+            <div class="right-panel">
+              <div class="section" style="height: 100%; display: flex; flex-direction: column;">
+                <!-- Jogadores -->
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                  <i class="fas fa-users"></i> Jogadores
+                </h4>
+                <div id="hostPlayersStatus" class="players-list" style="flex: 1; overflow-y: auto;"></div>
+                
+                <!-- Chat -->
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin: 10px 0;">
+                  <i class="fas fa-comments"></i> Chat
+                </h4>
+                <div class="chat-container" style="flex: 1; display: flex; flex-direction: column; min-height: 200px;">
+                  <div id="hostChat" class="chat-messages" style="flex: 1; overflow-y: auto;"></div>
+                  <div class="chat-input-group">
+                    <input type="text" id="hostChatInput" placeholder="Digite uma mensagem..." />
+                    <button id="btnHostSendChat" class="btn-info">
+                      <i class="fas fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAYER AREA -->
+      <div id="playerArea" class="hidden fade-in">
+        <div id="playerStep1" class="section">
+          <div class="title">Entrar Numa Partida</div>
+          
+          <div class="input-group">
+            <i class="fas fa-hashtag"></i>
+            <input type="text" id="inputGameCodePlayer" placeholder="Digite o código da partida..." />
+          </div>
+          
+          <button id="btnEnterCodePlayer" class="btn-info btn-lg">
+            <i class="fas fa-sign-in-alt"></i> Entrar na Partida
+          </button>
+          
+          <p style="margin-top: 15px; text-align: center; color: #666;">
+            <i class="fas fa-qrcode"></i> ou escaneie o QR Code fornecido pelo organizador
+          </p>
+        </div>
+
+        <div id="playerRegister" class="hidden section">
+          <div class="title">Como quer ser chamado?</div>
+          
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="inputPlayerName" placeholder="Digite seu nome..." />
+          </div>
+          
+          <button id="btnJoinPlayerGame" class="btn-success btn-lg">
+            <i class="fas fa-check-circle"></i> Confirmar e Entrar
+          </button>
+        </div>
+
+        <div id="playerLobby" class="hidden section">
+          <div class="title">Sala de Espera</div>
+          
+          <div class="status-panel">
+            <i class="fas fa-hourglass-half"></i> Aguardando o organizador iniciar a partida...
+            <div class="loader"></div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px; text-align: center;"><i class="fas fa-users"></i> Jogadores na Sala</h4>
+            <div id="playerLobbyList" class="players-list"></div>
+          </div>
+        </div>
+
+        <div id="playerGame" class="hidden">
+          <div class="game-grid">
+            <!-- Cabeçalho -->
+            <div class="header-area">
+              <div id="playerStatusPanel" class="status-panel hidden"></div>
+              
+              <!-- Finger Box - Poder do Dedo -->
+              <div class="finger-box hidden" id="fingerBox">
+                <h4 style="font-weight: 600; margin-bottom: 10px;"><i class="fas fa-hand-point-up fa-bounce"></i> Poder do Dedo Ativo!</h4>
+                <p style="margin-bottom: 10px;">Seja rápido para não ser o último!</p>
+                <button id="btnFingerClick" class="btn-danger" style="margin-top: 5px; width: 100%;">
+                  <i class="fas fa-bolt"></i> CLIQUE AGORA!
+                </button>
+                <div id="fingerQueue" style="margin-top: 10px; font-weight: 500;"></div>
+              </div>
+            </div>
+            
+            <!-- Painel Esquerdo -->
+            <div class="left-panel">
+              <div class="section" style="height: 100%; display: flex; flex-direction: column;">
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                  <i class="fas fa-gamepad"></i> Sua Jogada
+                </h4>
+                
+                <!-- Carta Atual -->
+                <div style="text-align: center; margin-bottom: 15px;">
+                  <h5 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                    <i class="fas fa-crown"></i> Carta Atual
+                  </h5>
+                  <div id="currentCardPlayer" style="text-align: center;">Nenhuma</div>
+                  <button id="btnDrawCardPlayer" class="btn-warning" style="display: none; margin-top: 15px; width: 100%;">
+                    <i class="fas fa-hand-paper"></i> Puxar Carta
+                  </button>
+                </div>
+                
+                <!-- Baralho -->
+                <div class="deck-container">
+                  <h5 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 5px;">
+                    <i class="fas fa-layer-group"></i> Baralho
+                  </h5>
+                  <div id="deckCountPlayer" style="margin-bottom: 5px; color: var(--primary-dark); font-weight: 500;"></div>
+                  <div id="deckViewPlayer"></div>
+                </div>
+                
+                <!-- Ações especiais -->
+                <div style="text-align: center; margin-top: auto; padding-top: 15px;" class="button-group">
+                  <button id="btnUseJoker" class="btn-info" style="display: none;">
+                    <i class="fas fa-magic"></i> Usar Coringa
+                  </button>
+                  <button id="btnActivateFinger" class="btn-warning" style="display: none;">
+                    <i class="fas fa-hand-point-up"></i> Poder do Dedo
+                  </button>
+                  <button id="btnRecordVideo" class="btn-dark">
+                    <i class="fas fa-video"></i> Gravar
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Painel Central - Eventos do Jogo -->
+            <div class="center-panel">
+              <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px; text-align: center;">
+                <i class="fas fa-history"></i> Eventos do Jogo
+              </h4>
+              <div class="main-panel-box">
+                <div id="playerPainel" class="event-log"></div>
+              </div>
+              
+              <!-- Regras Ativas -->
+              <div style="margin-top: 10px;">
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                  <i class="fas fa-book"></i> Regras Ativas
+                </h4>
+                <div id="playerRules" class="rules-box" style="max-height: 100px; overflow-y: auto;"></div>
+              </div>
+            </div>
+            
+            <!-- Painel Direito -->
+            <div class="right-panel">
+              <div class="section" style="height: 100%; display: flex; flex-direction: column;">
+                <!-- Jogadores -->
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 10px;">
+                  <i class="fas fa-users"></i> Jogadores
+                </h4>
+                <div id="playerListStatus" class="players-list" style="flex: 1; overflow-y: auto;"></div>
+                
+                <!-- Chat -->
+                <h4 style="font-family: var(--font-heading); color: var(--primary-dark); margin: 10px 0;">
+                  <i class="fas fa-comments"></i> Chat
+                </h4>
+                <div class="chat-container" style="flex: 1; display: flex; flex-direction: column; min-height: 200px;">
+                  <div id="playerChat" class="chat-messages" style="flex: 1; overflow-y: auto;"></div>
+                  <div class="chat-input-group">
+                    <input type="text" id="playerChatInput" placeholder="Digite uma mensagem..." />
+                    <button id="btnPlayerSendChat" class="btn-info">
+                      <i class="fas fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- contentScroll -->
+  </div><!-- mainContainer -->
+
+  <!-- OVERLAY DE VÍDEO -->
+  <div id="videoOverlay">
+    <h3><i class="fas fa-video"></i> Gravação de Vídeo</h3>
+    <video id="videoPreview" autoplay muted playsinline></video>
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+      <button id="btnStartRecording" class="btn-success">
+        <i class="fas fa-play"></i> Iniciar
+      </button>
+      <button id="btnStopRecording" class="btn-danger">
+        <i class="fas fa-stop"></i> Parar
+      </button>
+      <button id="btnCloseVideoOverlay" class="btn-dark">
+        <i class="fas fa-times"></i> Fechar
+      </button>
+    </div>
+  </div>
+
+  <!-- Script personalizado -->
+  <script src="script.js"></script>
+</body>
+</html>
