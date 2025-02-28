@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- CSS personalizado -->
+  <!-- CSS Personalizado -->
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -30,6 +30,11 @@
     <!-- Barra de navegação -->
     <div class="navbar">
       <h1><i class="fas fa-hand-point-up logo-icon"></i> O Poder do Dedo</h1>
+      <div class="navbar-menu">
+        <button id="btnInfoRules" class="btn-info btn-sm">
+          <i class="fas fa-question-circle"></i> Regras
+        </button>
+      </div>
     </div>
     
     <div id="contentScroll">
@@ -371,8 +376,40 @@
       </button>
     </div>
   </div>
+  
+  <!-- OVERLAY DE REGRAS -->
+  <div id="rulesOverlay" class="overlay">
+    <div class="overlay-content">
+      <h3><i class="fas fa-book"></i> Regras do Jogo</h3>
+      <div class="rules-content">
+        <h4>Como jogar</h4>
+        <p>O Poder do Dedo é um jogo de cartas para beber, onde cada carta tem uma regra específica.</p>
+        
+        <h4>Regras das cartas:</h4>
+        <ul>
+          <li><strong>A</strong> - Escolha alguém para beber</li>
+          <li><strong>2</strong> - Você bebe</li>
+          <li><strong>3</strong> - Todos bebem</li>
+          <li><strong>4</strong> - Crie uma nova regra para o jogo</li>
+          <li><strong>5</strong> - Bebem todos os homens</li>
+          <li><strong>6</strong> - Todas as regras são anuladas</li>
+          <li><strong>7</strong> - "Eu nunca": Diga algo que nunca fez, quem já fez, bebe</li>
+          <li><strong>8</strong> - Poder do Dedo: Você ativa o "último a colocar o dedo na mesa bebe"</li>
+          <li><strong>9</strong> - Inverte o sentido do jogo</li>
+          <li><strong>10</strong> - Pula o próximo jogador</li>
+          <li><strong>J (Valete)</strong> - Você bebe uma dose</li>
+          <li><strong>Q (Rainha)</strong> - Todas as mulheres bebem</li>
+          <li><strong>K (Rei)</strong> - Todos os homens bebem</li>
+          <li><strong>Coringa</strong> - Você ganha um coringa para usar quando não quiser beber</li>
+        </ul>
+      </div>
+      <button id="btnCloseRulesOverlay" class="btn-primary">
+        <i class="fas fa-check"></i> Entendi
+      </button>
+    </div>
+  </div>
 
-  <!-- Script personalizado -->
+  <!-- JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
