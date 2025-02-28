@@ -90,6 +90,16 @@ body, html {
   font-weight: 700;
 }
 
+.navbar-menu {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.9rem;
+}
+
 .logo-icon {
   margin-right: 10px;
   font-size: 1.8rem;
@@ -303,4 +313,565 @@ input[type="text"]:focus {
   background: var(--white);
   border: 1px solid #e0e0e0;
   border-radius: var(--border-radius-md);
-  max-height:
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 12px;
+  margin-top: 10px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+.rules-box {
+  background: var(--white);
+  border: 1px solid #e0e0e0;
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  min-height: 60px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+.rule-item {
+  background: #f1f8e9;
+  margin: 6px 0;
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--success);
+}
+
+/* CARTAS E BARALHO */
+.card-front {
+  width: 100px; 
+  height: 140px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  background: var(--white);
+  margin: 5px auto;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+  transform-style: preserve-3d;
+}
+
+.card-front:hover {
+  transform: translateY(-5px) rotateY(10deg);
+  box-shadow: var(--shadow-md);
+}
+
+.card-rank-suit {
+  position: absolute; 
+  top: 8px; 
+  left: 8px; 
+  font-size: 1.4rem; 
+  font-weight: bold;
+}
+
+.card-center-symbol {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.red { color: var(--card-red); }
+.black { color: var(--card-black); }
+
+.card-back {
+  width: 15px; 
+  height: 25px;
+  background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+  border-radius: 3px;
+  display: inline-block;
+  margin: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.deck-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px 0;
+}
+
+#deckView, #deckViewPlayer {
+  display: flex; 
+  flex-wrap: wrap; 
+  max-width: 100px; 
+  margin-top: 8px;
+  justify-content: center;
+}
+
+/* ÁREA DO PODER DO DEDO */
+.finger-box {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--border-radius-md);
+  padding: 15px;
+  margin: 15px 0;
+  box-shadow: var(--shadow-sm);
+  animation: highlight 1s ease-in-out infinite alternate;
+}
+
+@keyframes highlight {
+  from { box-shadow: 0 0 5px rgba(255, 214, 0, 0.5); }
+  to { box-shadow: 0 0 15px rgba(255, 214, 0, 0.8); }
+}
+
+@keyframes animate-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-pulse {
+  animation: animate-pulse 1.5s ease-in-out infinite;
+}
+
+/* Modo de clique rápido */
+#btnFingerClick {
+  animation: grow 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes grow {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+/* PLAYERS LIST */
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-item {
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.player-item.current {
+  background: #e3f2fd;
+  border-left: 3px solid var(--primary);
+}
+
+.player-avatar {
+  width: 30px;
+  height: 30px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.player-name {
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.player-badges {
+  display: flex;
+  gap: 5px;
+}
+
+.badge {
+  background: var(--primary-dark);
+  color: white;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.badge-joker {
+  background: var(--secondary);
+}
+
+.badge-turn {
+  background: var(--success);
+}
+
+/* CHAT */
+.chat-container {
+  margin-top: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+
+.chat-messages {
+  height: 150px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+.chat-input-group {
+  display: flex;
+  border-top: 1px solid #e0e0e0;
+}
+
+.chat-input-group input {
+  flex-grow: 1;
+  border: none;
+  padding: 12px;
+  border-radius: 0;
+  margin: 0;
+}
+
+.chat-input-group button {
+  border-radius: 0;
+  margin: 0;
+}
+
+.chat-message {
+  margin-bottom: 8px;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-message strong {
+  color: var(--primary-dark);
+}
+
+.chat-message.host-message strong {
+  color: var(--secondary-dark);
+}
+
+/* VIDEO OVERLAY */
+#videoOverlay {
+  position: fixed; 
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  color: var(--white);
+  display: none;
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+
+#videoOverlay h3 {
+  margin-bottom: 15px;
+  font-family: var(--font-heading);
+}
+
+video {
+  background: #000; 
+  max-width: 90vw; 
+  max-height: 60vh;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+/* QR CODE */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px 0;
+  padding: 15px;
+  background: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ANIMAÇÕES DE TRANSIÇÃO */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* SEÇÃO DE ESCOLHA DE MODO */
+.mode-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mode-card {
+  background: white;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+  cursor: pointer;
+}
+
+.mode-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.mode-card-header {
+  background: var(--primary);
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-family: var(--font-heading);
+}
+
+.mode-card-host .mode-card-header {
+  background: var(--dark);
+}
+
+.mode-card-player .mode-card-header {
+  background: var(--primary);
+}
+
+.mode-card-body {
+  padding: 15px;
+  text-align: center;
+}
+
+.mode-card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: var(--primary-dark);
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .card-front {
+    width: 80px;
+    height: 112px;
+  }
+  
+  .title {
+    font-size: 1.1rem;
+  }
+  
+  .navbar h1 {
+    font-size: 1.2rem;
+  }
+}
+
+/* LOADER/SPINNER */
+.loader {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid var(--primary);
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* PAINEL DE REGRAS DE CARTA */
+.card-rule-panel {
+  background: linear-gradient(135deg, #ffeecc 0%, #ffe0b2 100%);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--border-radius-md);
+  padding: 15px;
+  margin: 15px 0;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+  display: none;
+}
+
+.card-rule-panel.visible {
+  max-height: 100px;
+  padding: 15px;
+  margin: 15px 0;
+  display: flex;
+}
+
+.rule-icon {
+  font-size: 2rem;
+}
+
+.rule-text {
+  flex: 1;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+.rule-panel-animate {
+  animation: highlight-rule 1s ease-in-out;
+}
+
+@keyframes highlight-rule {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* OVERLAY DE REGRAS */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.overlay-content {
+  background: white;
+  padding: 30px;
+  border-radius: var(--border-radius-md);
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  width: 600px;
+}
+
+.overlay-content h3 {
+  color: var(--primary-dark);
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: var(--font-heading);
+}
+
+.rules-content {
+  margin-bottom: 20px;
+}
+
+.rules-content h4 {
+  color: var(--primary);
+  margin: 15px 0 5px 0;
+}
+
+.rules-content ul {
+  padding-left: 20px;
+}
+
+.rules-content li {
+  margin-bottom: 8px;
+}
+
+/* MELHORIAS RESPONSIVAS */
+@media (max-width: 480px) {
+  .navbar h1 {
+    font-size: 1.2rem;
+  }
+  
+  .navbar-menu {
+    flex-wrap: wrap;
+  }
+  
+  .card-front {
+    width: 70px;
+    height: 98px;
+  }
+  
+  .card-rank-suit {
+    font-size: 1.2rem;
+  }
+  
+  .card-center-symbol {
+    font-size: 2rem;
+  }
+  
+  .overlay-content {
+    padding: 15px;
+    width: 95%;
+  }
+}
+
+/* Para TVs e telas grandes */
+@media (min-width: 1200px) {
+  #mainContainer {
+    max-width: 1600px;
+  }
+  
+  .card-front {
+    width: 120px;
+    height: 168px;
+  }
+  
+  .event-log {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .chat-messages {
+    height: 300px;
+  }
+}
+
+/* Melhoria de scroll */
+.event-log, .chat-messages, .rules-box, .players-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-light) #f1f1f1;
+}
+
+.event-log::-webkit-scrollbar, 
+.chat-messages::-webkit-scrollbar, 
+.rules-box::-webkit-scrollbar,
+.players-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.event-log::-webkit-scrollbar-track, 
+.chat-messages::-webkit-scrollbar-track, 
+.rules-box::-webkit-scrollbar-track,
+.players-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.event-log::-webkit-scrollbar-thumb, 
+.chat-messages::-webkit-scrollbar-thumb, 
+.rules-box::-webkit-scrollbar-thumb,
+.players-list::-webkit-scrollbar-thumb {
+  background-color: var(--primary-light);
+  border-radius: 10px;
+}
+
+/* Ajustes para melhor exibição dos painéis em dispositivos móveis */
+@media (max-width: 768px) {
+  .left-panel, .right-panel {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  /* Melhoria para painel de eventos sempre visível */
+  .center-panel {
+    order: -1;
+  }
+  
+  /* Garantir que o painel de status fique visível */
+  .status-panel, .card-rule-panel {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+}
